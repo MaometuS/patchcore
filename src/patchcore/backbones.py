@@ -1,5 +1,7 @@
 import timm  # noqa
 import torchvision.models as models  # noqa
+import patchcore.vision_transformer as vits
+import torch
 
 _BACKBONES = {
     "alexnet": "models.alexnet(pretrained=True)",
@@ -48,4 +50,18 @@ _BACKBONES = {
 
 
 def load(name):
+    if name == 'custom_iad':
+        checkpoint = torch.load('/home/maometus/Documents/projects/checkpoint.pth')
+        state_dict = {}
+        for _, (k, v) in enumerate(checkpoint['student'].items()):
+            if k.startswith('module.backbone.'):
+                state_dict[k.replace('module.backbone.', '')] = v
+        model = vits.__dict__['vit_small'](patch_size=16, num_classes=0)
+        for p in model.parameters():
+            p.requires_grad = False
+        model.load_state_dict(state_dict)
+        model.eval()
+        return model
+
+
     return eval(_BACKBONES[name])
