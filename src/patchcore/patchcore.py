@@ -113,12 +113,9 @@ class PatchCore(torch.nn.Module):
             _features = features[i]
             patch_dims = patch_shapes[i]
 
-            print(_features.shape)
-            print(patch_dims)
-
             # TODO(pgehler): Add comments
             _features = _features.reshape(
-                _features.shape[0], patch_dims[0], patch_dims[1], *_features.shape[3:]
+                _features.shape[0], patch_dims[0], patch_dims[1], *_features.shape[2:]
             )
             _features = _features.permute(0, -3, -2, -1, 1, 2)
             perm_base_shape = _features.shape
@@ -294,6 +291,8 @@ class PatchMaker:
         unfolder = torch.nn.Unfold(
             kernel_size=self.patchsize, stride=self.stride, padding=padding, dilation=1
         )
+        if len(features.shape) == 3:
+            features = features.view(features.shape[0], features.shape[1], 16, 24)
         unfolded_features = unfolder(features)
         number_of_total_patches = []
         for s in features.shape[-2:]:
