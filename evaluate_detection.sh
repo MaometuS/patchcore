@@ -1,7 +1,7 @@
 datapath=/home/maometus/Documents/datasets/mvtec_anomaly_detection
 loadpath=/home/maometus/Documents/projects/patchcore/results/MVTecAD_Results
 
-modelfolder=IM224_IAD_L2-3_P01_D1024-1024_PS-3_AN-1_S0_75
+modelfolder=IM224_IAD_L2-3_P01_D1024-1024_PS-3_AN-1_S0_0
 # modelfolder=IM224_Ensemble_L2-3_P001_D1024-384_PS-3_AN-1
 savefolder=evaluated_results'/'$modelfolder
 

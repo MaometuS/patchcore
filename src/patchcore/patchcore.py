@@ -2,6 +2,7 @@
 import logging
 import os
 import pickle
+import math
 
 import numpy as np
 import torch
@@ -292,7 +293,11 @@ class PatchMaker:
             kernel_size=self.patchsize, stride=self.stride, padding=padding, dilation=1
         )
         if len(features.shape) == 3:
-            features = features.view(features.shape[0], features.shape[1], 16, 24)
+            features = features.transpose(1, 2)
+            features = features[:, :, 1:]
+            hw = int(math.sqrt(features.shape[2]))
+            features = features.view(features.shape[0], features.shape[1], hw, hw)
+
         unfolded_features = unfolder(features)
         number_of_total_patches = []
         for s in features.shape[-2:]:
