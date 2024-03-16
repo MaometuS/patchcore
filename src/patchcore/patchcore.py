@@ -294,7 +294,8 @@ class PatchMaker:
         )
         if len(features.shape) == 3:
             features = features.transpose(1, 2)
-            features = features[:, :, 1:]
+            if features.shape[2] == 197:
+                features = features[:, :, 1:]
             hw = int(math.sqrt(features.shape[2]))
             features = features.view(features.shape[0], features.shape[1], hw, hw)
 
