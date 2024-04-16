@@ -10,9 +10,11 @@ _BACKBONES = {
     '(pretrained="imagenet", num_classes=1000)',
     "resnet50": "models.resnet50(pretrained=True)",
     "resnet101": "models.resnet101(pretrained=True)",
+    "resnet152": "models.resnet152(pretrained=True)",
     "resnext101": "models.resnext101_32x8d(pretrained=True)",
     "resnet200": 'timm.create_model("resnet200", pretrained=True)',
     "resnest50": 'timm.create_model("resnest50d_4s2x40d", pretrained=True)',
+    "dino_resnet50": "torch.hub.load('facebookresearch/dino:main', 'dino_resnet50')",
     "resnetv2_50_bit": 'timm.create_model("resnetv2_50x3_bitm", pretrained=True)',
     "resnetv2_50_21k": 'timm.create_model("resnetv2_50x3_bitm_in21k", pretrained=True)',
     "resnetv2_101_bit": 'timm.create_model("resnetv2_101x3_bitm", pretrained=True)',
@@ -51,6 +53,30 @@ _BACKBONES = {
 
 
 def load(name):
+    if name == 'relicv2_50':
+        model = models.resnet50()
+        model.load_state_dict(torch.load('/home/maometus/Documents/projects/relic/relicv2_checkpoint_R50_1x.pkl'))
+        model.eval()
+        return
+
+    if name == 'relicv2_101':
+        model = models.resnet101()
+        model.load_state_dict(torch.load('/home/maometus/Documents/projects/relic/relicv2_checkpoint_R101_1x.pkl'))
+        model.eval()
+        return
+
+    if name == 'relicv2_152':
+        model = models.resnet152()
+        model.load_state_dict(torch.load('/home/maometus/Documents/projects/relic/relicv2_checkpoint_R152_1x.pkl'))
+        model.eval()
+        return
+
+    if name == 'relicv2_200':
+        model = models.resnet200()
+        model.load_state_dict(torch.load('/home/maometus/Documents/projects/relic/relicv2_checkpoint_R200_1x.pkl'))
+        model.eval()
+        return
+
     if name == 'custom_iad':
         checkpoint = torch.load('/home/maometus/Documents/projects/checkpoint.pth')
         state_dict = {}
@@ -65,7 +91,7 @@ def load(name):
         return model
 
     if name == 'custom_iad_vit_base':
-        checkpoint = torch.load('/home/maometus/Documents/projects/custom_iad_vit_base_ep96.pth')
+        checkpoint = torch.load('/home/maometus/Documents/projects/custom_iad_vit_base_ep100.pth')
         state_dict = {}
         for _, (k, v) in enumerate(checkpoint['student'].items()):
             if k.startswith('module.backbone.'):
