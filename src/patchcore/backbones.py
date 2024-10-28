@@ -90,6 +90,44 @@ def load(name):
         model.eval()
         return model
 
+    if name == 'custom_wd50':
+        checkpoint = torch.load('/home/maometus/Documents/projects/custom_wd50_ep95.pth')
+        state_dict = {}
+        for _, (k, v) in enumerate(checkpoint['student'].items()):
+            if k.startswith('module.backbone.'):
+                state_dict[k.replace('module.backbone.', '')] = v
+        model = models.wide_resnet50_2()
+        for p in model.parameters():
+            p.requires_grad = False
+        model.load_state_dict(state_dict, strict=False)
+        model.eval()
+        return model
+
+    if name == 'custom_grid':
+        checkpoint = torch.load('/home/maometus/Documents/projects/custom_grid_wd50_ep100.pth')
+        state_dict = {}
+        for _, (k, v) in enumerate(checkpoint['student'].items()):
+            if k.startswith('module.backbone.'):
+                state_dict[k.replace('module.backbone.', '')] = v
+        model = models.wide_resnet50_2()
+        for p in model.parameters():
+            p.requires_grad = False
+        model.load_state_dict(state_dict, strict=False)
+        model.eval()
+        return model
+    
+    if name == 'swav_resnet50':
+        model = torch.hub.load('facebookresearch/swav:main', 'resnet50')
+        model.eval()
+        return model
+
+    if name == 'custom_wd50_random':
+        model = models.wide_resnet50_2()
+        for p in model.parameters():
+            p.requires_grad = False
+        model.eval()
+        return model
+
     if name == 'custom_iad_vit_base':
         checkpoint = torch.load('/home/maometus/Documents/projects/custom_iad_vit_base_ep100.pth')
         state_dict = {}

@@ -146,15 +146,21 @@ def run(methods, results_path, gpu, seed, save_segmentation_images):
 
             LOGGER.info("Computing evaluation metrics.")
             # Compute Image-level AUROC scores for all images.
-            auroc = patchcore.metrics.compute_imagewise_retrieval_metrics(
+            instance_scores = patchcore.metrics.compute_imagewise_retrieval_metrics(
                 scores, anomaly_labels
-            )["auroc"]
+            )
+            auroc = instance_scores["auroc"]
+            prauc = instance_scores["prauc"]
+            mcc = instance_scores["mcc"]
 
             # Compute PRO score & PW Auroc for all images
             pixel_scores = patchcore.metrics.compute_pixelwise_retrieval_metrics(
                 segmentations, masks_gt
             )
             full_pixel_auroc = pixel_scores["auroc"]
+            full_pixel_prauc = pixel_scores["prauc"]
+            full_pixel_mcc = pixel_scores["mcc"]
+            full_pixel_pro = pixel_scores["pro"]
 
             # Compute PRO score & PW Auroc only for images with anomalies
             sel_idxs = []
@@ -165,13 +171,24 @@ def run(methods, results_path, gpu, seed, save_segmentation_images):
                 [segmentations[i] for i in sel_idxs], [masks_gt[i] for i in sel_idxs]
             )
             anomaly_pixel_auroc = pixel_scores["auroc"]
+            anomaly_pixel_prauc = pixel_scores["prauc"]
+            anomaly_pixel_mcc = pixel_scores["mcc"]
+            anomaly_pixel_pro = pixel_scores["pro"]
 
             result_collect.append(
                 {
                     "dataset_name": dataset_name,
                     "instance_auroc": auroc,
+                    "instance_prauc": prauc,
+                    "instance_mcc": mcc,
                     "full_pixel_auroc": full_pixel_auroc,
+                    "full_pixel_prauc": full_pixel_prauc,
+                    "full_pixel_mcc": full_pixel_mcc,
+                    "full_pixel_pro": full_pixel_pro,
                     "anomaly_pixel_auroc": anomaly_pixel_auroc,
+                    "anomaly_pixel_prauc": anomaly_pixel_prauc,
+                    "anomaly_pixel_mcc": anomaly_pixel_mcc,
+                    "anomaly_pixel_pro": anomaly_pixel_pro,
                 }
             )
 

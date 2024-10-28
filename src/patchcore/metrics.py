@@ -19,10 +19,31 @@ def compute_imagewise_retrieval_metrics(
     fpr, tpr, thresholds = metrics.roc_curve(
         anomaly_ground_truth_labels, anomaly_prediction_weights
     )
+
     auroc = metrics.roc_auc_score(
         anomaly_ground_truth_labels, anomaly_prediction_weights
     )
-    return {"auroc": auroc, "fpr": fpr, "tpr": tpr, "threshold": thresholds}
+
+    precision, recall, pr_thresholds = metrics.precision_recall_curve(
+        anomaly_ground_truth_labels, anomaly_prediction_weights
+    )
+    F1_scores = np.divide(
+        2 * precision * recall,
+        precision + recall,
+        out=np.zeros_like(precision),
+        where=(precision + recall) != 0,
+    )
+    optimal_threshold = pr_thresholds[np.argmax(F1_scores)]
+    predictions = (anomaly_prediction_weights >= optimal_threshold).astype(int)
+
+    prauc = metrics.auc(recall, precision)
+
+    mcc = metrics.matthews_corrcoef(
+        anomaly_ground_truth_labels, predictions
+    )
+    mcc = (mcc+1)/2
+
+    return {"auroc": auroc, "prauc": prauc, "mcc": mcc, "fpr": fpr, "tpr": tpr, "threshold": thresholds}
 
 
 def compute_pixelwise_retrieval_metrics(anomaly_segmentations, ground_truth_masks):
@@ -61,16 +82,43 @@ def compute_pixelwise_retrieval_metrics(anomaly_segmentations, ground_truth_mask
         where=(precision + recall) != 0,
     )
 
+    prauc = metrics.auc(recall, precision)
+
+
     optimal_threshold = thresholds[np.argmax(F1_scores)]
     predictions = (flat_anomaly_segmentations >= optimal_threshold).astype(int)
     fpr_optim = np.mean(predictions > flat_ground_truth_masks)
     fnr_optim = np.mean(predictions < flat_ground_truth_masks)
 
+    mcc = metrics.matthews_corrcoef(
+        flat_ground_truth_masks.astype(int), predictions
+    )
+    mcc = (mcc+1)/2
+
+    unique_regions = np.unique(ground_truth_masks)
+    pro_scores = []
+    for region in unique_regions:
+        pred_region = predictions[flat_ground_truth_masks == region]
+        gt_region = flat_ground_truth_masks[flat_ground_truth_masks == region].astype(int)
+        pro_score = metrics.jaccard_score(gt_region, pred_region)
+        pro_scores.append(pro_score)
+    pro_average = np.mean(pro_scores)
+
+    pro_score = 0
+    for i in range(anomaly_segmentations.shape[0]):
+        anomaly_mask = (anomaly_segmentations[i] >= optimal_threshold).astype(int)
+        ground_truth_mask = ground_truth_masks[i].astype(int)
+        pro_score += metrics.jaccard_score(anomaly_mask.ravel(), ground_truth_mask.ravel(), zero_division=1.0)
+    pro_score /= anomaly_segmentations.shape[0]
+
     return {
         "auroc": auroc,
+        "prauc": prauc,
+        "mcc": mcc,
         "fpr": fpr,
         "tpr": tpr,
         "optimal_threshold": optimal_threshold,
         "optimal_fpr": fpr_optim,
         "optimal_fnr": fnr_optim,
+        "pro": pro_score,
     }
