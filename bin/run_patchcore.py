@@ -16,7 +16,10 @@ import patchcore.utils
 
 LOGGER = logging.getLogger(__name__)
 
-_DATASETS = {"mvtec": ["patchcore.datasets.mvtec", "MVTecDataset"]}
+_DATASETS = {
+    "mvtec": ["patchcore.datasets.mvtec", "MVTecDataset"],
+    "real_iad": ["patchcore.datasets.realiad", "Real_IAD_Dataset"]
+}
 
 
 @click.group(chain=True)
@@ -405,7 +408,7 @@ def dataset(
             test_dataloader = torch.utils.data.DataLoader(
                 test_dataset,
                 batch_size=batch_size,
-                shuffle=False,
+                shuffle=True,
                 num_workers=num_workers,
                 pin_memory=True,
             )
