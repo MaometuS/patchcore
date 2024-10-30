@@ -165,7 +165,6 @@ class Real_IAD_Dataset(torch.utils.data.Dataset):
                 
             
             if self.split == DatasetSplit.TEST:
-                cnts = {}
                 for item in class_data['test']:
                     if not item["anomaly_class"] in imgpaths_per_class[classname]:
                         imgpaths_per_class[classname][item['anomaly_class']] = []
@@ -173,26 +172,11 @@ class Real_IAD_Dataset(torch.utils.data.Dataset):
                     if not item["anomaly_class"] in maskpaths_per_class[classname]:
                         maskpaths_per_class[classname][item['anomaly_class']] = []
 
-                    if not item["anomaly_class"] in cnts:
-                        cnts[item['anomaly_class']] = 0
-                    
-                    cnts[item['anomaly_class']] = cnts[item['anomaly_class']] + 1
-
                     imgpaths_per_class[classname][item['anomaly_class']].append(os.path.join(classpath, item['image_path']))
                     if item['mask_path'] != None:
                         maskpaths_per_class[classname][item['anomaly_class']].append(os.path.join(classpath, item['mask_path']))
-                
-                if "OK" in imgpaths_per_class[classname]:
-                    avg_cnt = 0
-                    class_cnt = 0
-                    for key in cnts:
-                        avg_cnt += cnts[key]
-                        class_cnt+=1
-                    
-                    avg_cnt/=class_cnt
-                    avg_cnt = min(int(avg_cnt), len(imgpaths_per_class[classname]["OK"]))
-                    
-                    imgpaths_per_class[classname]["OK"] = imgpaths_per_class[classname]["OK"][:avg_cnt]
+                    else:
+                        maskpaths_per_class[classname][item['anomaly_class']].append(None)
 
             # for anomaly in anomaly_types:
             #     anomaly_path = os.path.join(classpath, anomaly)
