@@ -1,3 +1,4 @@
+#!/bin/bash
 #SBATCH --job-name=PATCHCORE
 ###########RESOURCES###########
 #SBATCH --partition=48-2
