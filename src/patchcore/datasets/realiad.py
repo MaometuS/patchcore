@@ -169,42 +169,16 @@ class Real_IAD_Dataset(torch.utils.data.Dataset):
                     if not item["anomaly_class"] in imgpaths_per_class[classname]:
                         imgpaths_per_class[classname][item['anomaly_class']] = []
 
-                    if not item["anomaly_class"] in maskpaths_per_class[classname]:
+                    if item["anomaly_class"] != "OK" and not item["anomaly_class"] in maskpaths_per_class[classname]:
                         maskpaths_per_class[classname][item['anomaly_class']] = []
 
+                    anomaly_types = anomaly_types | {item['anomaly_class']}
+
                     imgpaths_per_class[classname][item['anomaly_class']].append(os.path.join(classpath, item['image_path']))
-                    if item['mask_path'] != None:
+                    if item['anomaly_class'] != "OK":
                         maskpaths_per_class[classname][item['anomaly_class']].append(os.path.join(classpath, item['mask_path']))
                     else:
-                        maskpaths_per_class[classname][item['anomaly_class']].append(None)
-
-            # for anomaly in anomaly_types:
-            #     anomaly_path = os.path.join(classpath, anomaly)
-            #     anomaly_files = sorted(os.listdir(anomaly_path))
-            #     imgpaths_per_class[classname][anomaly] = [
-            #         os.path.join(anomaly_path, x) for x in anomaly_files
-            #     ]
-
-            #     if self.train_val_split < 1.0:
-            #         n_images = len(imgpaths_per_class[classname][anomaly])
-            #         train_val_split_idx = int(n_images * self.train_val_split)
-            #         if self.split == DatasetSplit.TRAIN:
-            #             imgpaths_per_class[classname][anomaly] = imgpaths_per_class[
-            #                 classname
-            #             ][anomaly][:train_val_split_idx]
-            #         elif self.split == DatasetSplit.VAL:
-            #             imgpaths_per_class[classname][anomaly] = imgpaths_per_class[
-            #                 classname
-            #             ][anomaly][train_val_split_idx:]
-
-            #     if self.split == DatasetSplit.TEST and anomaly != "good":
-            #         anomaly_mask_path = os.path.join(maskpath, anomaly)
-            #         anomaly_mask_files = sorted(os.listdir(anomaly_mask_path))
-            #         maskpaths_per_class[classname][anomaly] = [
-            #             os.path.join(anomaly_mask_path, x) for x in anomaly_mask_files
-            #         ]
-            #     else:
-            #         maskpaths_per_class[classname]["good"] = None
+                        maskpaths_per_class[classname][item['anomaly_class']] = None
 
         # Unrolls the data dictionary to an easy-to-iterate list.
         data_to_iterate = []

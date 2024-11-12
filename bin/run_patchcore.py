@@ -135,7 +135,7 @@ def run(
             segmentations = np.mean(segmentations, axis=0)
 
             anomaly_labels = [
-                x[1] != "good" for x in dataloaders["testing"].dataset.data_to_iterate
+                (x[1] != "OK") for x in dataloaders["testing"].dataset.data_to_iterate
             ]
 
             # (Optional) Plot example images.
@@ -408,7 +408,7 @@ def dataset(
             test_dataloader = torch.utils.data.DataLoader(
                 test_dataset,
                 batch_size=batch_size,
-                shuffle=True,
+                shuffle=False,
                 num_workers=num_workers,
                 pin_memory=True,
             )
