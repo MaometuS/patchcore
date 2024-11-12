@@ -104,7 +104,7 @@ def load(name):
         return model
 
     if name == 'custom_grid':
-        checkpoint = torch.load('/home/maometus/Documents/projects/custom_grid_wd50_ep100.pth')
+        checkpoint = torch.load('/po1/rakhimov/patchcore_backbones/custom_grid_wd50_ep100.pth')
         state_dict = {}
         for _, (k, v) in enumerate(checkpoint['student'].items()):
             if k.startswith('module.backbone.'):
