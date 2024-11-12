@@ -1,3 +1,5 @@
 .idea/
+evaluated_results
+results
 __pycache__/
 LabletAnomaly.egg-info/
