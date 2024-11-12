@@ -1,6 +1,6 @@
-#SBATCH --job-name=DION_IAD
+#SBATCH --job-name=PATCHCORE
 ###########RESOURCES###########
-#SBATCH --partition=48-4
+#SBATCH --partition=48-2
 #SBATCH --gres=gpu:4
 #SBATCH --mem=100G
 #SBATCH --cpus-per-task=8
